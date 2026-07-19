@@ -6,5 +6,7 @@ import com.app.expenseautomator.entity.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+
+    public Boolean existsByEmail(String email);
     
 }
