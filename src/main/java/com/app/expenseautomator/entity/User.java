@@ -32,7 +32,7 @@ public class User {
     public User(String email, String password) {
         this.email = email;
         this.password = password;
-        this.setName();
+        this.name = email.substring(0, email.indexOf("@"));
     }
 
     public Long getId() {
@@ -59,7 +59,7 @@ public class User {
         this.password = password;
     }
 
-    public void setName() {
-        this.name = email.substring(0, email.indexOf("@"));
+    public void setName(String name) {
+        this.name = name;
     }
 }

@@ -1,4 +1,4 @@
-package com.app.expenseautomator.dtos;
+package com.app.expenseautomator.dtos.user;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 

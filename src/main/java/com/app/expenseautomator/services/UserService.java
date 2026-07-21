@@ -1,8 +1,11 @@
 package com.app.expenseautomator.services;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
-import com.app.expenseautomator.dtos.UserDto;
+import com.app.expenseautomator.dtos.user.UserDto;
+import com.app.expenseautomator.dtos.user.UserUpdateRequestDto;
 import com.app.expenseautomator.entity.User;
 import com.app.expenseautomator.exceptions.UserAlreadyExistsException;
 import com.app.expenseautomator.exceptions.UserNotFoundException;
@@ -30,8 +33,24 @@ public class UserService {
         return user;
     }
 
-    public UserDto getUserById(Long id) {
+    public User getUserById(Long id) {
         User user = repository.findById(id).orElseThrow(() -> new UserNotFoundException());
+        return user;
+    }
+
+    public User updateUserById(Long id, UserUpdateRequestDto updateRequest) {
+        User user = getUserById(id);
+        user.setName(updateRequest.name());
+        Optional<String> email = updateRequest.email();
+
+        if (email.isPresent()) {
+            user.setEmail(email.get());
+        }
+
+        return repository.save(user);
+    }
+
+    public UserDto toDto(User user) {
         return new UserDto(user.getId(), user.getEmail(), user.getName());
     }
     
