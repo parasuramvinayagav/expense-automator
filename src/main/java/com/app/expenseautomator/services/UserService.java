@@ -1,11 +1,9 @@
 package com.app.expenseautomator.services;
 
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 
-import com.app.expenseautomator.dtos.user.UserDto;
-import com.app.expenseautomator.dtos.user.UserUpdateRequestDto;
+import com.app.expenseautomator.dtos.user.CreateUserRequest;
+import com.app.expenseautomator.dtos.user.UpdateUserRequest;
 import com.app.expenseautomator.entity.User;
 import com.app.expenseautomator.exceptions.UserAlreadyExistsException;
 import com.app.expenseautomator.exceptions.UserNotFoundException;
@@ -23,14 +21,21 @@ public class UserService {
     }
 
     @Transactional
-    public User registerUser(User user) {
+    public User registerUser(CreateUserRequest user) {
         String userEmail = user.getEmail();
-        if (repository.existsByEmail(userEmail)) {
+        if (!userEmail.isBlank() && repository.existsByEmail(userEmail)) {
             throw new UserAlreadyExistsException(userEmail);
         }
 
-        repository.save(user);
-        return user;
+        User registerUser = new User();
+        registerUser.setEmail(userEmail);
+        registerUser.setPassword(user.getPassword());
+
+        String userName = user.getName();
+        if (userName != null) { registerUser.setName(userName); }
+        else { registerUser.setNameFromEmail(); }
+
+        return repository.save(registerUser);
     }
 
     public User getUserById(Long id) {
@@ -38,20 +43,28 @@ public class UserService {
         return user;
     }
 
-    public User updateUserById(Long id, UserUpdateRequestDto updateRequest) {
+    @Transactional
+    public User updateUserById(Long id, UpdateUserRequest updateRequest) {
         User user = getUserById(id);
-        user.setName(updateRequest.name());
-        Optional<String> email = updateRequest.email();
+        String userName = updateRequest.getName();
 
-        if (email.isPresent()) {
-            user.setEmail(email.get());
+        if (userName != null) {
+            user.setName(userName);
+        }
+
+        String password = updateRequest.getPassword();
+
+        if (password != null) {
+            user.setPassword(password);
         }
 
         return repository.save(user);
     }
 
-    public UserDto toDto(User user) {
-        return new UserDto(user.getId(), user.getEmail(), user.getName());
+    @Transactional
+    public void deleteUserById(Long id) {
+        User user = getUserById(id);
+        repository.delete(user);
     }
     
 }

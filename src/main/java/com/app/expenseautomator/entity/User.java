@@ -27,14 +27,6 @@ public class User {
     @Column(nullable = false)
     private String name;
 
-    protected User() {}
-
-    public User(String email, String password) {
-        this.email = email;
-        this.password = password;
-        this.name = email.substring(0, email.indexOf("@"));
-    }
-
     public Long getId() {
         return id;
     }
@@ -61,5 +53,14 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setNameFromEmail() {
+        this.name = email.substring(0, email.indexOf("@"));
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Username: %s, Email: %s, Password: %s", getName(), getEmail(), getPassword());
     }
 }
