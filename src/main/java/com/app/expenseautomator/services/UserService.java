@@ -9,6 +9,7 @@ import com.app.expenseautomator.exceptions.UserAlreadyExistsException;
 import com.app.expenseautomator.exceptions.UserNotFoundException;
 import com.app.expenseautomator.repositories.UserRepository;
 
+import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -23,19 +24,17 @@ public class UserService {
     @Transactional
     public User registerUser(CreateUserRequest user) {
         String userEmail = user.getEmail();
-        if (!userEmail.isBlank() && repository.existsByEmail(userEmail)) {
+        if (StringUtils.isNotBlank(userEmail) && repository.existsByEmail(userEmail)) {
             throw new UserAlreadyExistsException(userEmail);
         }
 
-        User registerUser = new User();
-        registerUser.setEmail(userEmail);
-        registerUser.setPassword(user.getPassword());
-
+        User newUser = new User();
+        newUser.setEmail(userEmail);
+        newUser.setPassword(user.getPassword());
         String userName = user.getName();
-        if (userName != null) { registerUser.setName(userName); }
-        else { registerUser.setNameFromEmail(); }
+        newUser.setName(StringUtils.isNotBlank(userName) ? userName : newUser.getNameFromEmail());
 
-        return repository.save(registerUser);
+        return repository.save(newUser);
     }
 
     public User getUserById(Long id) {
@@ -48,13 +47,13 @@ public class UserService {
         User user = getUserById(id);
         String userName = updateRequest.getName();
 
-        if (userName != null) {
+        if (StringUtils.isNotBlank(userName)) {
             user.setName(userName);
         }
 
         String password = updateRequest.getPassword();
 
-        if (password != null) {
+        if (StringUtils.isNotBlank(password)) {
             user.setPassword(password);
         }
 

@@ -23,6 +23,11 @@ public class ExceptionResponseConfig extends ResponseEntityExceptionHandler {
     public ProblemDetail handleUserNotFound(UserNotFoundException ex) {
         return getProblemTemplate(HttpStatus.NOT_FOUND, ex);
     }
+    
+    @ExceptionHandler(NullPointerException.class)
+    public ProblemDetail handleUserCreationException() {
+        return getProblemTemplate(HttpStatus.INTERNAL_SERVER_ERROR , new NullPointerException("Something went wrong."));
+    }
 
     public ProblemDetail getProblemTemplate(HttpStatusCode status, Exception ex) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(status);

@@ -1,9 +1,16 @@
 package com.app.expenseautomator.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -11,6 +18,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "users")
+@EntityListeners(AuditingEntityListener.class)
 public class User {
     
     @Id
@@ -26,6 +34,14 @@ public class User {
 
     @Column(nullable = false)
     private String name;
+
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 
     public Long getId() {
         return id;
@@ -43,6 +59,14 @@ public class User {
         return name;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
     public void setEmail(String email) {
         this.email = email;
     }
@@ -55,8 +79,9 @@ public class User {
         this.name = name;
     }
 
-    public void setNameFromEmail() {
-        this.name = email.substring(0, email.indexOf("@"));
+    @JsonIgnore
+    public String getNameFromEmail() {
+        return email.substring(0, email.indexOf("@"));
     }
 
     @Override
