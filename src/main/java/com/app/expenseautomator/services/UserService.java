@@ -1,5 +1,6 @@
 package com.app.expenseautomator.services;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.app.expenseautomator.dtos.user.CreateUserRequest;
@@ -30,7 +31,8 @@ public class UserService {
 
         User newUser = new User();
         newUser.setEmail(userEmail);
-        newUser.setPassword(user.getPassword());
+        String encodedPassword = (new BCryptPasswordEncoder()).encode(user.getPassword());
+        newUser.setPassword(encodedPassword);
         String userName = user.getName();
         newUser.setName(StringUtils.isNotBlank(userName) ? userName : newUser.getNameFromEmail());
 
