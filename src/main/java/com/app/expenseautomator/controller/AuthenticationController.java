@@ -1,6 +1,5 @@
 package com.app.expenseautomator.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.app.expenseautomator.dtos.auth.JwtResponse;
 import com.app.expenseautomator.dtos.auth.LoginRequest;
 import com.app.expenseautomator.security.JwtService;
 
@@ -18,11 +18,8 @@ import com.app.expenseautomator.security.JwtService;
 @RequestMapping("/api/auth")
 public class AuthenticationController {
 
-    @Autowired
     private final AuthenticationManager authManager;
-    @Autowired
     private final UserDetailsService uDetailsService;
-    @Autowired
     private final JwtService jwtService;
 
     public AuthenticationController(AuthenticationManager authManager, UserDetailsService uDetailsService, JwtService jwtService) {
@@ -42,6 +39,6 @@ public class AuthenticationController {
         UserDetails uDetails = uDetailsService.loadUserByUsername(email);
         String token = jwtService.generateToken(uDetails);
 
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(new JwtResponse(token, jwtService.getExpiration(token)));
     }
 }
