@@ -3,6 +3,8 @@ package com.app.expenseautomator.services;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +22,15 @@ import com.app.expenseautomator.repositories.ExpenseRepository;
 public class ExpenseService {
     
     private ExpenseRepository repository;
+    private UserService userService;
 
-    public ExpenseService(ExpenseRepository repository) {
+    public ExpenseService(ExpenseRepository repository, UserService userService) {
         this.repository = repository;
+        this.userService = userService;
+    }
+
+    public User getAuthUser() {
+        return userService.getAuthenticatedUser();
     }
 
     public Expense createExpense(CreateExpenseRequest request) {
@@ -36,14 +44,13 @@ public class ExpenseService {
             expense.setEndTime(endTime.atTime(LocalTime.MAX));
         }
 
-        User user = null;
-        if (user == null) {
-            throw new UserNotFoundException();
-        }
-
+        expense.setUser(getAuthUser());
         expense.setExpenseType(ExpenseType.valueOf(request.getExpenseType()));
         expense.setValue(request.getValue());
         return repository.save(expense);
     }
-    
+
+    public List<Expense> listAuthUserExpenses() {
+        return repository.findByUser(getAuthUser());
+    }
 }

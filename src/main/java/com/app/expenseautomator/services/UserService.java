@@ -1,5 +1,9 @@
 package com.app.expenseautomator.services;
 
+import java.util.Optional;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -66,6 +70,11 @@ public class UserService {
     public void deleteUserById(Long id) {
         User user = getUserById(id);
         repository.delete(user);
+    }
+
+    public User getAuthenticatedUser() {
+        String authEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return repository.findByEmail(authEmail).orElseThrow(() -> new UserNotFoundException());
     }
     
 }
